@@ -1,0 +1,21 @@
+# Dependencies for the knolwedge base project
+# Created 2024-12-26
+
+chromadb
+elevenlabs
+fastembed
+langchain~=0.3.13
+langchain-community~=0.3.13
+langchain-core~=0.3.28
+langchain-ollama
+langchain_text_splitters
+ollama~=0.4.4
+pdfplumber
+qdrant-client~=1.12.1
+sentence-transformers~=3.3.1
+streamlit~=1.41.1
+unstructured~=0.16.11
+unstructured[all-docs]
+numpy~=1.26.4
+langchain-text-splitters~=0.3.4
+

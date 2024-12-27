@@ -1,0 +1,34 @@
+# .gitignore, created MM, 2013-03-06
+
+# IDE directories.
+.idea/
+*.iml
+.venv
+*.classpath
+*.project
+
+# Misc junk.
+*.pyc
+*.dmg
+*.iso
+*.rar
+*.zip
+*.log
+*.sqlite
+*.swp
+.DS_Store
+
+# Output directories.
+build/
+dist/
+.metadata/
+out/
+*.egg-info/
+MANIFEST
+
+# Encryption specific extensions to ignore.
+*.pem
+*.pub
+*.enc
+*.ipynb
+
