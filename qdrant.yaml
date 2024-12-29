@@ -1,0 +1,19 @@
+# Docker Compose
+# Runs the KnowledgeBase App with Qdrant as the vector search engine
+# streamlit as the UI frontend.
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    hostname: qdrant
+    container_name: qdrant
+    networks:
+      - kb_network
+    ports:
+      - "6333:6333"
+    volumes:
+      - "${QDRANT_STORAGE:?Please set the QDRANT_STORAGE environment variable}:/qdrant/storage"
+
+networks:
+  kb_network:
+    driver: bridge
