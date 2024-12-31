@@ -10,3 +10,10 @@ CHUNK_SIZE: int = 512
 # Qdrant client constants
 QDRANT_URL: str = "http://localhost:6333"
 QDRANT_COLLECTION: str = "tech_articles"
+
+# Query defaults, can be overridden at runtime
+
+# The number of results to return
+TOP_K = 5
+# The minimum similarity threshold for a result to be considered
+MIN_THRESHOLD = 0.5
