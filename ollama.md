@@ -70,7 +70,7 @@ that allows users to interact with the model without having to use the command l
 ```shell
 pip install ollama
 ```
-then use it as shown in [`use_model.py`](use_model.py).
+then use it as shown in [`use_model.py`](examples/use_model.py_model.py).
 
-['pdf-rag-streamlit'](pdf-rag-streamlit.py) is a Streamlit app that uses the Ollama API to 
+['pdf-rag-streamlit'](examples/pdf-rag-streamlit.pyeamlit.py) is a Streamlit app that uses the Ollama API to 
 analyzed a PDF and answers questions about it.

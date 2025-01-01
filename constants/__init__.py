@@ -17,3 +17,8 @@ QDRANT_COLLECTION: str = "tech_articles"
 TOP_K = 5
 # The minimum similarity threshold for a result to be considered
 MIN_THRESHOLD = 0.5
+
+# Logging
+APP_NAME = "bertrand"
+LOG_FILE = f"{APP_NAME}"
+LOG_DIR = f"/tmp/{APP_NAME}/logs/"
