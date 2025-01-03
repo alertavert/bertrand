@@ -62,7 +62,7 @@ async def process_resume(file_path: str) -> dict:
 
 
 def save_uploaded_file(uploaded_file) -> str:
-    """Save uploaded file and return the file path"""
+    """Save uploaded file and return the file dirpath"""
     try:
         # Create uploads directory if it doesn't exist
         save_dir = Path("uploads")
