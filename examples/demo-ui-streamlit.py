@@ -4,21 +4,19 @@ import asyncio
 import os
 from datetime import datetime
 from pathlib import Path
-from streamlit_option_menu import option_menu
-from agents.orchestrator import OrchestratorAgent
-from utils.logger import setup_logger
-from utils.exceptions import ResumeProcessingError
+from utils import setup_logger, get_logger
 
 # Configure Streamlit page
 st.set_page_config(
-    page_title="AI Recruiter Agency",
+    page_title="Knowledge Base",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # Initialize logger
-logger = setup_logger()
+setup_logger(log_level=logging.DEBUG)
+logger = get_logger()
 
 # Custom CSS
 st.markdown(

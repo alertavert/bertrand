@@ -1,6 +1,6 @@
 # Embeddings module init file
 
-from typing import List, Tuple
+from typing import List, Tuple, IO
 
 import numpy
 from sentence_transformers import SentenceTransformer
@@ -41,13 +41,13 @@ class EmbeddingsGenerator(object):
         embeddings = self.model.encode(chunks)
         return embeddings
 
-    def from_file(self, file_path: str) -> Tuple[numpy.ndarray, List[str]]:
+    def from_file(self, file: IO[bytes]) -> Tuple[numpy.ndarray, List[str]]:
         """Generate embeddings from a PDF file.
 
-        :param file_path: Path to the PDF file.
+        :param file: a file-like object for the PDF file.
         :return: Tuple of embeddings, one vector per chunk, and the respective text chunks, a list of strings.
         """
-        elements: List[Element] = partition_pdf(filename=file_path)
+        elements: List[Element] = partition_pdf(file=file)
         text: List[str] = [element.text for element in elements if element.text]
         return self.from_text(text)
 
