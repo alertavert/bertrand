@@ -62,6 +62,7 @@ class EmbeddingsStore(object):
         This uses Qdrant's `search` method to find the `k` most similar embeddings to the query, and is
         thus limited to using a single embedding vector as the query.
 
+        :param threshold: The maximum distance threshold for a result to be considered.
         :param embeddings: The query string encoded as an embedding (use `EmbeddingsGenerator.query_vect`).
         :param k: The number of most similar embeddings to return.
         :return: List of tuples, each containing the text and the similarity score.
@@ -71,4 +72,5 @@ class EmbeddingsStore(object):
             query_vector=embeddings,
             limit=k,
         )
+        # TODO: use the threshold to filter the results
         return [(result.payload["text"], result.score) for result in results]
