@@ -9,6 +9,7 @@ from qdrant_client.models import (
 )
 
 from constants import *
+from utils import get_logger
 
 
 # TODO: Use Pydantic to validate the input data
@@ -25,6 +26,7 @@ class EmbeddingsStore(object):
         self._collection = collection
         self._embeddings_dim = embeddings_dim
         self._init_collection()
+        self.log = get_logger()
 
     @property
     def dim(self) -> int:
@@ -48,8 +50,12 @@ class EmbeddingsStore(object):
                 vectors_config=vector_configs,
             )
 
-    def store_embeddings(self, chunks, embeddings) -> None:
+    def store_embeddings(self, chunks: List[str], embeddings: numpy.ndarray) -> None:
         """Store chunks and embeddings in Qdrant."""
+        if embeddings.shape[0] == 0:
+            self.log.warning("No embeddings to store")
+            return
+        self.log.debug(f"Storing {embeddings.shape} embeddings")
         points = [
             PointStruct(id=i, vector=embedding, payload={"text": chunk})
             for i, (chunk, embedding) in enumerate(zip(chunks, embeddings))
