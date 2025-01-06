@@ -1,6 +1,8 @@
 import argparse
 import logging
+import sys
 import time
+from os import system
 from pathlib import Path
 from typing import List
 
@@ -41,6 +43,12 @@ def parse_args()  -> argparse.Namespace:
         default=EMBED_DIM,
         help=f"Embedding dimension (default: {EMBED_DIM})."
     )
+    parser.add_argument(
+        "--stop-on-error",
+        action='store_true',
+        help="By default the script will continue processing files even if an error occurs. "
+             "Use this flag to stop if an error is encountered."
+    )
     return parser.parse_args()
 
 
@@ -63,12 +71,22 @@ def main():
     # Get all files
     files: List[Path] = all_files_in(args.source_dir)
     logger.info(f"Found {len(files)} file(s) to process.")
+    if args.stop_on_error:
+        logger.info("--stop-on-error specified, bulk upload will stop if an error is encountered.")
 
     for file_path in files:
-        logger.debug(f"Processing file: {file_path}")
-        with open(file_path, "rb") as f:
-            embeddings, chunks = gen.from_file(f)
-            store.store_embeddings(chunks, embeddings)
+        try:
+            logger.debug(f"Processing file: {file_path}")
+            with open(file_path, "rb") as f:
+                embeddings, chunks = gen.from_file(f)
+                store.store_embeddings(chunks, embeddings)
+            logger.info(f"File {file_path} processed successfully.")
+        except Exception as e: # noqa
+            logger.error(f"Error processing file {file_path}: {e}",
+                         exc_info=args.debug)
+            if args.stop_on_error:
+                logger.error("Stopping bulk upload due to error.")
+                sys.exit(1)
 
     elapsed_time = time.time() - start_time
     logger.info(f"Processing completed in {elapsed_time:.2f} seconds.")

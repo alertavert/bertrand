@@ -31,8 +31,8 @@ def all_files_in(dirpath: Path,
         log.error(f"Path does not exist: {dirpath}")
         return []
 
-    # if ext is provided, we convert it to a regex pattern, if neither
-    # include nor exclude is provided.
+    # if ext is provided, we convert it to a regex pattern,
+    # but ONLY IF include is not provided
     if ext:
         if not ext.startswith("."):
             ext = f"\\.{ext}"
@@ -46,7 +46,7 @@ def all_files_in(dirpath: Path,
 
     result = []
     if dirpath.is_file():
-        if _matches_criteria(dirpath, include, exclude):
+        if _matches_criteria(str(dirpath), include, exclude):
             result.append(dirpath.absolute())
     else:
         for curdir, _, files in dirpath.walk():
