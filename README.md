@@ -1,125 +1,55 @@
+# Bertrand -- Local Knowledge Agent
+
+A basic implementation of a locally-running LLM with RAG.
+
+![Bertrand](static/screenshot.png)
+
+### Copyright & Licensing
+
+**The code is copyright (c) 2024 AlertAvert.com. All rights reserved**<br>
+The code is released under the Apache 2.0 License, see `LICENSE` for details.
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
-Here’s a high-level guide to building a Retrieval-Augmented Generation (RAG) pipeline locally using the tools you mentioned:
+# System configuration
 
-# Steps to Build the RAG Pipeline
+## System Architecture Overview
 
-## 1. Ingest and Chunk PDF Files
+![Architecture](static/arch.png)
 
-Use unstructured.io to read and process PDF files. The library can extract content and metadata from PDFs.
 
-```python
-from unstructured.partition.pdf import partition_pdf
+1.	*PDF Ingestion and Chunking:*
+	Uses `unstructured.io` to extract text and split it into manageable chunks.
+2.	*Embedding Generation:*
+	Use a suitable embedding model (from `sentence-transformers`).
+3.	*Vector Store (Qdrant):*
+	Store embeddings and associated metadata in a local Qdrant instance (running via Docker).
+4.	*Query Execution:*
+	Retrieve relevant chunks from Qdrant based on user input.
+5.	*LLM Querying (Ollama):*
+	Use Ollama to generate context-aware answers using retrieved chunks.
+6.	*Frontend (Streamlit):*
+	Provide a user interface for querying the knowledge base and displaying results.
 
-def chunk_pdf(file_path, chunk_size=512):
-    """Ingest a PDF file, extract text, and chunk it."""
-    elements = partition_pdf(filename=file_path)
-    text = " ".join([element.text for element in elements if element.text])
-    
-    # Split text into chunks
-    chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
-    return chunks
+
+# LLM (Ollama)
+We run a local copy of [Meta](https://meta.com)'s [Llama 3.2 3B model](https://ollama.com/library/llama3.2) using `ollama`:
+
+```shell
+ollama run llama3.2:latest
 ```
 
-## 2. Generate Embeddings
+However, even if the LLM is not running (use `ollama ps` to confirm) it will be started automatically when running the `ollama.generate()` function.
 
-Use an embedding model compatible with your LLM (e.g., models from sentence-transformers, OpenAI, or others supported by Pinecone). If Ollama supports embedding generation, use its API.
-```python
-from sentence_transformers import SentenceTransformer
+See also [this course on YouTube](https://youtu.be/GWB9ApTPTv4) for more details.
 
-def generate_embeddings(chunks, model_name="all-MiniLM-L6-v2"):
-    """Generate embeddings for text chunks."""
-    model = SentenceTransformer(model_name)
-    embeddings = model.encode(chunks)
-    return embeddings
-```
-
-## 3. Store in a Vector Database
-
-You can use Pinecone for storing the embeddings. If you prefer a fully local solution, use alternatives like FAISS.
-
-Pinecone Example:
-```python title=Pinecone
-import pinecone
-
-# Initialize Pinecone
-pinecone.init(api_key="your-api-key", environment="us-west1-gcp")  # Replace with your Pinecone key and environment
-index_name = "rag-vector-store"
-
-# Create a new index (if not exists)
-if index_name not in pinecone.list_indexes():
-    pinecone.create_index(index_name, dimension=384)
-
-index = pinecone.Index(index_name)
-
-def store_embeddings(chunks, embeddings):
-    """Store text chunks and their embeddings in Pinecone."""
-    for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
-        index.upsert([(f"chunk-{i}", embedding, {"text": chunk})])
-```
-
-
-FAISS Example:
-
-```python title=FAISS
-import faiss
-import numpy as np
-
-def create_faiss_index(embeddings):
-    """Create a FAISS index for the embeddings."""
-    dimension = embeddings.shape[1]
-    index = faiss.IndexFlatL2(dimension)
-    index.add(np.array(embeddings))
-    return index
-```
-
-## 4. Query the Vector Store
-
-Retrieve the most relevant chunks using cosine similarity.
-
-Pinecone Query Example:
-```python title="Query Pinecone"
-def query_pinecone(query_text, model, top_k=5):
-    """Query Pinecone for the most relevant chunks."""
-    query_embedding = model.encode([query_text])[0]
-    results = index.query(query_embedding, top_k=top_k, include_metadata=True)
-    return results
-```
-FAISS Query Example:
-```python title="Query FAISS"
-def query_faiss(query_text, model, faiss_index, chunks, top_k=5):
-    """Query FAISS for the most relevant chunks."""
-    query_embedding = model.encode([query_text])[0]
-    distances, indices = faiss_index.search(np.array([query_embedding]), top_k)
-    results = [(chunks[i], distances[0][i]) for i in indices[0]]
-    return results
-```
-
-## 5. Integrate with Local LLM (Ollama)
-
-You can use the retrieved chunks to provide context for a query to your locally running LLM with Ollama.
-```python title=ollama
-import subprocess
-
-def query_ollama(prompt, context):
-    """Query Ollama with a contextualized prompt."""
-    full_prompt = f"{context}\n\n{prompt}"
-    process = subprocess.run(["ollama", "run", full_prompt], capture_output=True, text=True)
-    return process.stdout
-```
-
-### Summary of the Tech Stack
-1.	PDF Processing: `unstructured.io` for ingestion and chunking.
-2.	Embedding Generation: `sentence-transformers` or Ollama (if supported).
-3.	Vector Store: `Pinecone` for cloud-based, `FAISS` for local.
-4.	Query Execution: Retrieve relevant context from the vector store.
-5.	LLM Integration: `Ollama` for generating responses.
 
 # Vector DB
 
 ## Qdrant
 
-Qdrant is a vector database designed for real-time, high-performance similarity search. It offers a simple API and runs efficiently on local machines.
+[Qdrant](https://qdrant.tech) is a vector database designed for real-time, high-performance similarity search. It offers a simple API and runs efficiently on local machines.
 	•	Key Features:
 	•	Lightweight and fast.
 	•	REST API with gRPC support.
@@ -130,7 +60,6 @@ Qdrant is a vector database designed for real-time, high-performance similarity 
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
-[Qdrant docs](https://qdrant.tech/documentation/)
 
 **Why Qdrant?**
 	•	Ease of Use: Simple setup with REST and Python APIs.
@@ -143,24 +72,7 @@ docker run -p 6333:6333 qdrant/qdrant
 	•	Run Qdrant locally via Docker or as a standalone binary.
 	•	Use Qdrant’s Python client for embedding storage and querying.
 
-# System configuration
-
-## System Architecture Overview
-
-*1.	PDF Ingestion and Chunking:*
-	•	Use unstructured.io to extract text and split it into manageable chunks.
-*2.	Embedding Generation:*
-	•	Use a suitable embedding model (e.g., from sentence-transformers).
-*3.	Vector Store (Qdrant):*
-	•	Store embeddings and associated metadata in a local Qdrant instance (running via Docker).
-*4.	Query Execution:*
-	•	Retrieve relevant chunks from Qdrant based on user input.
-*5.	LLM Querying (Ollama):*
-	•	Use Ollama to generate context-aware answers using retrieved chunks.
-*6.	Frontend (Streamlit):*
-	•	Provide a user interface for querying the knowledge base and displaying results.
-
-## Implementation
+### Implementation
 
 ```shell title='Run Qdrant'
 docker run -d -p 6333:6333 qdrant/qdrant
@@ -168,12 +80,41 @@ docker run -d -p 6333:6333 qdrant/qdrant
 
 Created the `bertie` virtualenv (see `requirements.txt`)
 
+# Run Locally
+
+## Python Virtualenv
+As with every Python project, the recommended way is to use `virtualenvwrapper`, and create a new venv, then install the dependencies there:
+
+```shell
+mkvirtualenv -p $(which python3) bertie
+pip install -r requirements.txt
+```
+this will also install and put on the `PATH` the necessary scripts (`ollama` and `streamlit`).
+
+## Running the KB
+
+The easiest way to run the app is to use `docker-compose`:
+
+```shell
+docker compose up -d
+```
+until integrated with `compose`, the Streamlit app needs to be run manually:<sup>1</sup>
+
+```shell
+streamlit run app.py [debug]
+```
+adding the `debug` flag will generate `DEBUG` logs.
+
+This should open a browser window showing the UI, at `http://localhost:8501`.
+
+<sup>1</sup> See [Issue #2](https://github.com/alertavert/bertrand/issues/2)
 
 
 # References
 
 - [Unstructured.io Docs](https://unstructured.io/)
-- [Pinecone Documentation](https://docs.pinecone.io/guides/get-started/overview)
-- [faiss: A library for efficient similarity search and clustering of dense vectors.](https://github.com/facebookresearch/faiss)
 - [SentenceTransformers Documentation](https://www.sbert.net/)
+- [Qdrant docs](https://qdrant.tech/documentation/)
+- [API & SDKs - Qdrant](https://qdrant.tech/documentation/interfaces/)
+- [Ollama Model Library](https://github.com/ollama/ollama?tab=readme-ov-file#model-library)
 
