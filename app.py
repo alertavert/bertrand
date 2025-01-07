@@ -54,18 +54,18 @@ def init_logger() -> logging.Logger:
     return get_logger()
 
 logger = init_logger()
-logger.debug("Logger initialized.")
+logger.debug("Logger initialized")
 
 @st.cache_resource
 def init_store() -> embeddings.EmbeddingsStore:
     """Initialize the embeddings store."""
-    logger.info("Initializing the embeddings store.")
+    logger.info("Initializing the embeddings store")
     return embeddings.EmbeddingsStore()
 
 @st.cache_resource
 def get_generator() -> embeddings.EmbeddingsGenerator:
     """A cached instance of the embeddings generator."""
-    logger.info("Initializing the embeddings generator.")
+    logger.info("Initializing the embeddings generator")
     return embeddings.EmbeddingsGenerator()
 
 def render_conversation():

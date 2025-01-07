@@ -72,7 +72,7 @@ def main():
     files: List[Path] = all_files_in(args.source_dir)
     logger.info(f"Found {len(files)} file(s) to process.")
     if args.stop_on_error:
-        logger.info("--stop-on-error specified, bulk upload will stop if an error is encountered.")
+        logger.info("--stop-on-error specified, bulk upload will stop if an error is encountered")
 
     for file_path in files:
         try:
@@ -80,16 +80,16 @@ def main():
             with open(file_path, "rb") as f:
                 embeddings, chunks = gen.from_file(f)
                 store.store_embeddings(chunks, embeddings)
-            logger.info(f"File {file_path} processed successfully.")
+            logger.info(f"File {file_path} processed successfully")
         except Exception as e: # noqa
             logger.error(f"Error processing file {file_path}: {e}",
                          exc_info=args.debug)
             if args.stop_on_error:
-                logger.error("Stopping bulk upload due to error.")
+                logger.error("Stopping bulk upload due to error")
                 sys.exit(1)
 
     elapsed_time = time.time() - start_time
-    logger.info(f"Processing completed in {elapsed_time:.2f} seconds.")
+    logger.info(f"Processing completed in {elapsed_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()

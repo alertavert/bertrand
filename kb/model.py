@@ -6,6 +6,9 @@ from constants import (
     LLM_MODEL,
 )
 from embeddings import EmbeddingsGenerator, EmbeddingsStore
+from utils import get_logger
+
+Log = get_logger()
 
 class KBQueryRunner:
     """Main interface towards the LLM model and the embeddings store."""
@@ -21,7 +24,10 @@ class KBQueryRunner:
         # Retrieve the chunks that match the prompt from the Vector DB
         matches: List[Tuple[str, float]] = self.store.search(embeddings[0])
         # Generate the context
+        for m, score in matches:
+            Log.debug(f"({score:.2f}) {m[:100]}")
         context = "\n---\n".join([match[0] for match in matches])
+        Log.debug(f"Generated context with {len(matches)} matches")
         return context
 
     def query(self, prompt: str) -> str:
@@ -29,13 +35,19 @@ class KBQueryRunner:
         # Generate the context
         context = self.generate_context(prompt)
         # Query the model
-        res = ollama.generate(
-            model=LLM_MODEL,
+        Log.debug(f"Querying the {LLM_MODEL} model with prompt ({len(prompt)}) and context ({len(context)})")
+        if len(context) > 0:
             prompt=f"""
                 Please answer the following question:
                 {prompt}
                 When answering, also consider this additional information:
                 {context}
                 """,
+        res = ollama.generate(
+            model=LLM_MODEL,
+            prompt=prompt,
         )
+        Log.debug(f"Response received: {len(res.get('response', ''))} characters.")
+        if "response" not in res:
+            Log.warning("LLM returned no response")
         return res.get("response", "No response found.")

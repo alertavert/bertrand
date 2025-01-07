@@ -11,6 +11,7 @@ from qdrant_client.models import (
 from constants import *
 from utils import get_logger
 
+Log = get_logger()
 
 # TODO: Use Pydantic to validate the input data
 class EmbeddingsStore(object):
@@ -26,7 +27,6 @@ class EmbeddingsStore(object):
         self._collection = collection
         self._embeddings_dim = embeddings_dim
         self._init_collection()
-        self.log = get_logger()
 
     @property
     def dim(self) -> int:
@@ -53,9 +53,9 @@ class EmbeddingsStore(object):
     def store_embeddings(self, chunks: List[str], embeddings: numpy.ndarray) -> None:
         """Store chunks and embeddings in Qdrant."""
         if embeddings.shape[0] == 0:
-            self.log.warning("No embeddings to store")
+            Log.warning("No embeddings to store")
             return
-        self.log.debug(f"Storing {embeddings.shape} embeddings")
+        Log.debug(f"Storing {embeddings.shape} embeddings")
         points = [
             PointStruct(id=i, vector=embedding, payload={"text": chunk})
             for i, (chunk, embedding) in enumerate(zip(chunks, embeddings))
@@ -77,6 +77,7 @@ class EmbeddingsStore(object):
             collection_name=self._collection,
             query_vector=embeddings,
             limit=k,
+            score_threshold=threshold,
         )
-        # TODO: use the threshold to filter the results
+        Log.debug(f"Found {len(results)} results that exceed the threshold ({threshold:.2f})")
         return [(result.payload["text"], result.score) for result in results]

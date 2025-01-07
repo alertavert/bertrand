@@ -7,6 +7,12 @@ class Role(StrEnum):
     USER = "user"
     ASSISTANT = "assistant"
 
+    def __repr__(self):
+        if self == Role.USER:
+            return "USER"
+        elif self == Role.ASSISTANT:
+            return "ASSISTANT"
+
 class Conversation:
     def __init__(self):
         self._messages: List[Dict[Role, str]] = []
@@ -18,8 +24,7 @@ class Conversation:
     def messages(self) -> List[Dict[Role, str]]:
         return self._messages
 
-    @property
-    def size(self) -> int:
+    def __len__(self):
         return len(self._messages)
 
     def reset(self):

@@ -17,7 +17,7 @@ QDRANT_COLLECTION: str = "tech_articles"
 # The number of results to return
 TOP_K = 5
 # The minimum similarity threshold for a result to be considered
-MIN_THRESHOLD = 0.5
+MIN_THRESHOLD = 0.3
 
 # Logging
 APP_NAME = "bertrand"
