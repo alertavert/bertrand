@@ -26,7 +26,7 @@ class KBQueryRunner:
         # Generate the context
         for m, score in matches:
             Log.debug(f"({score:.2f}) {m[:100]}")
-        context = "\n---\n".join([match[0] for match in matches])
+        context = "\n---\n".join([match for match, _ in matches])
         Log.debug(f"Generated context with {len(matches)} matches")
         return context
 
@@ -37,12 +37,7 @@ class KBQueryRunner:
         # Query the model
         Log.debug(f"Querying the {LLM_MODEL} model with prompt ({len(prompt)}) and context ({len(context)})")
         if len(context) > 0:
-            prompt=f"""
-                Please answer the following question:
-                {prompt}
-                When answering, also consider this additional information:
-                {context}
-                """,
+            prompt=f"{prompt}\nConsider this additional information:{context}"
         res = ollama.generate(
             model=LLM_MODEL,
             prompt=prompt,

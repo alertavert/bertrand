@@ -5,12 +5,12 @@
 # Retrieval embedding model and constants
 EMBED_MODEL: str = "all-MiniLM-L6-v2"
 EMBED_DIM: int = 384
-CHUNK_SIZE: int = 512
+CHUNK_SIZE: int = 1024
 LLM_MODEL: str = "llama3.2"
 
 # Qdrant client constants
 QDRANT_URL: str = "http://localhost:6333"
-QDRANT_COLLECTION: str = "tech_articles"
+QDRANT_COLLECTION: str = "tech_articles_1024"
 
 # Query defaults, can be overridden at runtime
 
