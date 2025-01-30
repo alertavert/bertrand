@@ -44,6 +44,15 @@ However, even if the LLM is not running (use `ollama ps` to confirm) it will be 
 
 See also [this course on YouTube](https://youtu.be/GWB9ApTPTv4) for more details.
 
+**Update**<br/>
+Given all the furore about DeepSeek R1 model, I have also added support for it, using the `ollama` model name `deepseek-r1`
+Simply change the value for `LLM_MODEL` in `constants/__init__.py` to `deepseek-r1`:
+
+```python
+LLM_MODEL: str = "deepseek-r1"
+```
+
+this will use the 7B model, but you can also use `deepseek-r1:14b` if your hardware supports it.
 
 # Vector DB
 

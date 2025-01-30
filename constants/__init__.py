@@ -6,7 +6,11 @@
 EMBED_MODEL: str = "all-MiniLM-L6-v2"
 EMBED_DIM: int = 384
 CHUNK_SIZE: int = 1024
+
+# The LLM model to use.
 LLM_MODEL: str = "llama3.2"
+# Use this to run the DeepSeek R1 model instead.
+#  LLM_MODEL: str = "deepseek-r1"
 
 # Qdrant client constants
 QDRANT_URL: str = "http://localhost:6333"
